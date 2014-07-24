@@ -41,6 +41,8 @@ class Tempaa
     el.data 'data', data
     el.data 'bind-func', null
 
+    @hook el, data if @hook
+
     if data
       el.attr 'data-bind-has-data', 'true'
     else
