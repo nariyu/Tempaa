@@ -14,7 +14,6 @@ class Tempaa
     'attr'
     'visible'
     'data'
-
     'event'
   ]
 
@@ -23,14 +22,14 @@ class Tempaa
     Data binding
   ###
   @bind: (_el, data)->
-    templateClass = @
     el = $ _el
 
     helper = @helper
-    helper = templateClass unless helper?
+    helper = @ unless helper?
 
-    oldData = el.data('data')
-    dataBindFunc = el.data('bind-func')
+    oldData = el.data 'data'
+    dataBindFunc = el.data 'bind-func'
+
     if oldData
       try
         return if _.isEqual JSON.parse(JSON.stringify(oldData)), JSON.parse(JSON.stringify(data))
@@ -45,9 +44,13 @@ class Tempaa
         else if typeof oldData.off is 'function'
           oldData.off 'change', dataBindFunc
 
-    el.removeClass 'template'
     el.data('data', data)
     el.data('bind-func', null)
+
+    if data
+      el.attr 'data-bind-has-data', 'true'
+    else
+      el.removeAttr 'data-bind-has-data'
 
     renderProperties = (text, data)->
       return {} unless data?
@@ -87,21 +90,38 @@ class Tempaa
 
       bindChildren = el.find(selectors.join(','))
       if el.is(selectors.join(','))
-        bindChildren = $([el].concat(bindChildren.get()))
+        bindChildren = $ [el].concat bindChildren.get()
+
+      repeatChildren = []
+      bindChildren.each (index, _child)=>
+        child = $ _child
+        repeatParents = child.parent().closest('*[data-bind^="foreach"],*[data-bind-foreach]').get()
+
+        childForeachs = el.find('*[data-bind^="foreach"],*[data-bind-foreach]').get()
+        repeatParents = $ _.intersection childForeachs, repeatParents
+
+        if repeatParents.length > 0
+          repeatChildren.push _child
+        repeatParents.each (index, _parent)=>
+          parent = $ _parent
+          template = parent.data('bind-foreach-template')
+          unless template
+            templateSelector = parent.attr('data-bind-template-selector')
+            if typeof templateSelector is 'string'
+              template = $(templateSelector)
+              tmpl = template.data('bind-foreach-template')
+              template = tmpl if tmpl
+            else
+              template = parent.children()
+            parent.data('bind-foreach-template', template)
+          parent.empty()
+
+      bindChildren = el.find(selectors.join(','))
+      if el.is(selectors.join(','))
+        bindChildren = $ [el].concat bindChildren.get()
 
       bindChildren.each (index, _child)=>
         child = $ _child
-
-        len = child.parent().closest('*[data-bind^="foreach"],*[data-bind-foreach]').length
-        if len > 0
-          child.attr('data-bind-skip', 'true')
-        else
-          child.removeAttr('data-bind-skip')
-
-      bindChildren.each (index, _child)=>
-        child = $ _child
-
-        return if child.attr('data-bind-skip')
 
         types = []
 
@@ -131,30 +151,18 @@ class Tempaa
 
             # foreach
             when 'foreach'
-              if !source or source is 'this'
+              if !source or source is 'data'
                 value = data
               else
                 value = renderProperties '{value:' + source + '}', data
                 value = value.value
 
               template = child.data('bind-foreach-template')
-              unless template
-                templateSelector = child.attr('data-bind-template-selector')
-                if typeof templateSelector is 'string'
-                  template = $(templateSelector)
-                  tmpl = template.data('bind-foreach-template')
-                  template = tmpl if tmpl
-                else
-                  template = child.children()
-                child.data('bind-foreach-template', template)
-                template.removeClass 'template' if template.hasClass 'template'
-
               child.empty()
               if $.isArray(value) or (typeof value?.length is 'number' and typeof value?.push is 'function')
                 for item in value
                   tmpl = template.clone(true)
-                  templateClass.bind tmpl, item
-                  tmpl.data('data', item)
+                  Tempaa.bind tmpl, item
                   child.append tmpl
 
             # text
@@ -162,7 +170,7 @@ class Tempaa
               return unless data?
 
               value = null
-              if !source or source is 'this'
+              if !source or source is 'data'
                 value = data
               else
                 value = renderProperties '{value:' + source + '}', data
@@ -178,7 +186,7 @@ class Tempaa
               return unless data?
 
               value = null
-              if !source or source is 'this'
+              if !source or source is 'data'
                 value = data
               else
                 value = renderProperties '{value:' + source + '}', data
@@ -214,7 +222,7 @@ class Tempaa
             # visible
             when 'visible'
               value = null
-              if !source or source is 'this'
+              if !source or source is 'data'
                 value = data
               else
                 value = renderProperties '{value:' + source + '}', data
@@ -230,7 +238,7 @@ class Tempaa
             # data
             when 'data'
               value = null
-              if !source or source is 'this'
+              if !source or source is 'data'
                 value = data
               else
                 value = renderProperties '{value:' + source + '}', data
@@ -248,17 +256,17 @@ class Tempaa
     if Object.observe
       # console.log '[Tempaa] Object.observe'
       Object.observe data, dataBind
-      el.data('bind-func', dataBind)
+      el.data 'bind-func', dataBind
 
     else if typeof data?.addListener is 'function'
       # console.log '[Tempaa] addListener'
       data.addListener 'change', dataBind
-      el.data('bind-func', dataBind)
+      el.data 'bind-func', dataBind
 
     else if typeof data?.on is 'function'
       # console.log '[Tempaa] on'
       data.on 'change', dataBind
-      el.data('bind-func', dataBind)
+      el.data 'bind-func', dataBind
 
     return el
 

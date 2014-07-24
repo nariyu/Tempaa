@@ -62,7 +62,7 @@ var user = {
 Tempaa.bind("#user", user);
 ```
 
-[More examples is here!](https://github.com/nariyu/tempaa/tree/master/examples)
+[More examples are here!](https://github.com/nariyu/tempaa/tree/master/examples)
 
 
 ## License

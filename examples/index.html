@@ -11,7 +11,7 @@
 
         // data
         var data = {
-          "text": "lorem ipsum",
+          "text": "lorem ipsum ...",
           "items": [
             {
               name: "Item #0",
@@ -66,19 +66,18 @@
             url: null,
             onclick: null
           });
-          data.items = data.items.slice();
+          data.items = data.items.slice(); // trigger
         }, 1000);
 
         // update array
         setTimeout(function() {
           data.items.shift();
-          data.items = data.items.slice();
+          data.items = data.items.slice(); // trigger
         }, 1500);
 
         // update array
         setTimeout(function() {
-          data.items[1].name = 'name updated!';
-          data.items = data.items.slice();
+          data.items[1].name = 'child name updated!';
         }, 2000);
       });
     </script>
@@ -93,6 +92,15 @@
       border: 1px solid #BBB;
       border-radius: 5px;
       cursor: pointer;
+    }
+    .smile {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #ffbc10;
+      text-align: center;
+      line-height: 30px;
     }
     </style>
   </head>
@@ -111,7 +119,7 @@
           <span data-bind-text="name"></span>
 
           <!-- test of data-bind-visible -->
-          <span data-bind-visible="smile">:D</span>
+          <span class="smile" data-bind-visible="smile">:D</span>
 
           <!-- test of data-bind-attr -->
           <a data-bind-visible="url" data-bind-attr="{href: url}">Link</a>

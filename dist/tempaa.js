@@ -17,12 +17,11 @@
      */
 
     Tempaa.bind = function(_el, data) {
-      var dataBind, dataBindFunc, e, el, helper, oldData, renderProperties, selectorType, selectorTypes, selectors, templateClass, _i, _len;
-      templateClass = this;
+      var dataBind, dataBindFunc, e, el, helper, oldData, renderProperties, selectorType, selectorTypes, selectors, _i, _len;
       el = $(_el);
       helper = this.helper;
       if (helper == null) {
-        helper = templateClass;
+        helper = this;
       }
       oldData = el.data('data');
       dataBindFunc = el.data('bind-func');
@@ -45,9 +44,13 @@
           }
         }
       }
-      el.removeClass('template');
       el.data('data', data);
       el.data('bind-func', null);
+      if (data) {
+        el.attr('data-bind-has-data', 'true');
+      } else {
+        el.removeAttr('data-bind-has-data');
+      }
       renderProperties = function(text, data) {
         var prop, render, source, value;
         if (data == null) {
@@ -93,30 +96,51 @@
         selectors.push("*[data-bind-" + selectorType + "]");
       }
       (dataBind = function() {
-        var bindChildren;
+        var bindChildren, repeatChildren;
         bindChildren = el.find(selectors.join(','));
         if (el.is(selectors.join(','))) {
           bindChildren = $([el].concat(bindChildren.get()));
         }
+        repeatChildren = [];
         bindChildren.each((function(_this) {
           return function(index, _child) {
-            var child, len;
+            var child, childForeachs, repeatParents;
             child = $(_child);
-            len = child.parent().closest('*[data-bind^="foreach"],*[data-bind-foreach]').length;
-            if (len > 0) {
-              return child.attr('data-bind-skip', 'true');
-            } else {
-              return child.removeAttr('data-bind-skip');
+            repeatParents = child.parent().closest('*[data-bind^="foreach"],*[data-bind-foreach]').get();
+            childForeachs = el.find('*[data-bind^="foreach"],*[data-bind-foreach]').get();
+            repeatParents = $(_.intersection(childForeachs, repeatParents));
+            if (repeatParents.length > 0) {
+              repeatChildren.push(_child);
             }
+            return repeatParents.each(function(index, _parent) {
+              var parent, template, templateSelector, tmpl;
+              parent = $(_parent);
+              template = parent.data('bind-foreach-template');
+              if (!template) {
+                templateSelector = parent.attr('data-bind-template-selector');
+                if (typeof templateSelector === 'string') {
+                  template = $(templateSelector);
+                  tmpl = template.data('bind-foreach-template');
+                  if (tmpl) {
+                    template = tmpl;
+                  }
+                } else {
+                  template = parent.children();
+                }
+                parent.data('bind-foreach-template', template);
+              }
+              return parent.empty();
+            });
           };
         })(this));
+        bindChildren = el.find(selectors.join(','));
+        if (el.is(selectors.join(','))) {
+          bindChildren = $([el].concat(bindChildren.get()));
+        }
         return bindChildren.each((function(_this) {
           return function(index, _child) {
-            var all, bindDef, child, classes, events, item, key, matches, name, oldStyle, oldValue, source, style, styles, template, templateSelector, tmpl, type, typeData, types, urlStyle, value, _j, _k, _l, _len1, _len2, _len3;
+            var all, bindDef, child, classes, events, item, key, matches, name, oldStyle, oldValue, source, style, styles, template, tmpl, type, typeData, types, urlStyle, value, _j, _k, _l, _len1, _len2, _len3;
             child = $(_child);
-            if (child.attr('data-bind-skip')) {
-              return;
-            }
             types = [];
             for (_j = 0, _len1 = selectorTypes.length; _j < _len1; _j++) {
               selectorType = selectorTypes[_j];
@@ -151,36 +175,19 @@
               source = source.replace(/(@|\$data)/g, 'data');
               switch (type) {
                 case 'foreach':
-                  if (!source || source === 'this') {
+                  if (!source || source === 'data') {
                     value = data;
                   } else {
                     value = renderProperties('{value:' + source + '}', data);
                     value = value.value;
                   }
                   template = child.data('bind-foreach-template');
-                  if (!template) {
-                    templateSelector = child.attr('data-bind-template-selector');
-                    if (typeof templateSelector === 'string') {
-                      template = $(templateSelector);
-                      tmpl = template.data('bind-foreach-template');
-                      if (tmpl) {
-                        template = tmpl;
-                      }
-                    } else {
-                      template = child.children();
-                    }
-                    child.data('bind-foreach-template', template);
-                    if (template.hasClass('template')) {
-                      template.removeClass('template');
-                    }
-                  }
                   child.empty();
                   if ($.isArray(value) || (typeof (value != null ? value.length : void 0) === 'number' && typeof (value != null ? value.push : void 0) === 'function')) {
                     for (_l = 0, _len3 = value.length; _l < _len3; _l++) {
                       item = value[_l];
                       tmpl = template.clone(true);
-                      templateClass.bind(tmpl, item);
-                      tmpl.data('data', item);
+                      Tempaa.bind(tmpl, item);
                       child.append(tmpl);
                     }
                   }
@@ -190,7 +197,7 @@
                     return;
                   }
                   value = null;
-                  if (!source || source === 'this') {
+                  if (!source || source === 'data') {
                     value = data;
                   } else {
                     value = renderProperties('{value:' + source + '}', data);
@@ -209,7 +216,7 @@
                     return;
                   }
                   value = null;
-                  if (!source || source === 'this') {
+                  if (!source || source === 'data') {
                     value = data;
                   } else {
                     value = renderProperties('{value:' + source + '}', data);
@@ -250,7 +257,7 @@
                   break;
                 case 'visible':
                   value = null;
-                  if (!source || source === 'this') {
+                  if (!source || source === 'data') {
                     value = data;
                   } else {
                     value = renderProperties('{value:' + source + '}', data);
@@ -267,7 +274,7 @@
                   break;
                 case 'data':
                   value = null;
-                  if (!source || source === 'this') {
+                  if (!source || source === 'data') {
                     value = data;
                   } else {
                     value = renderProperties('{value:' + source + '}', data);
