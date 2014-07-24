@@ -36,6 +36,9 @@
       }
       el.data('data', data);
       el.data('bind-func', null);
+      if (this.hook) {
+        this.hook(el, data);
+      }
       if (data) {
         el.attr('data-bind-has-data', 'true');
       } else {
