@@ -13,7 +13,6 @@
   ],
   "license": "MIT",
   "homepage": "https://github.com/nariyu/tempaa",
-  "private": true,
   "ignore": [
     "**/.*",
     "node_modules",
