@@ -179,6 +179,9 @@
                 child.empty();
                 if (value) {
                   if ($.isArray(value) || (typeof value.length === 'number' && typeof value.push === 'function')) {
+                    if (Array.observe) {
+                      Array.observe(value, dataBind);
+                    }
                     for (_l = 0, _len3 = value.length; _l < _len3; _l++) {
                       item = value[_l];
                       tmpl = template.clone(true);

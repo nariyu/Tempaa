@@ -160,6 +160,7 @@ class Tempaa
               child.empty()
               if value
                 if $.isArray(value) or (typeof value.length is 'number' and typeof value.push is 'function')
+                  Array.observe value, dataBind if Array.observe
                   for item in value
                     tmpl = template.clone true
                     Tempaa.bind tmpl, item
