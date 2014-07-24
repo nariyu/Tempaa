@@ -17,7 +17,7 @@
      */
 
     Tempaa.bind = function(_el, data) {
-      var dataBind, dataBindFunc, e, el, helper, oldData, renderProperties, selectorType, selectorTypes, selectors, _i, _len;
+      var dataBind, dataBindFunc, el, helper, oldData, renderProperties, selectorType, selectorTypes, selectors, _i, _len;
       el = $(_el);
       helper = this.helper;
       if (helper == null) {
@@ -25,23 +25,13 @@
       }
       oldData = el.data('data');
       dataBindFunc = el.data('bind-func');
-      if (oldData) {
-        try {
-          if (_.isEqual(JSON.parse(JSON.stringify(oldData)), JSON.parse(JSON.stringify(data)))) {
-            return;
-          }
-        } catch (_error) {
-          e = _error;
-          '';
-        }
-        if (dataBindFunc) {
-          if (Object.unobserve) {
-            Object.unobserve(oldData, dataBindFunc);
-          } else if (typeof oldData.removeListener === 'function') {
-            oldData.removeListener('change', dataBindFunc);
-          } else if (typeof oldData.off === 'function') {
-            oldData.off('change', dataBindFunc);
-          }
+      if (oldData && dataBindFunc) {
+        if (Object.unobserve) {
+          Object.unobserve(oldData, dataBindFunc);
+        } else if (typeof oldData.removeListener === 'function') {
+          oldData.removeListener('change', dataBindFunc);
+        } else if (typeof oldData.off === 'function') {
+          oldData.off('change', dataBindFunc);
         }
       }
       el.data('data', data);
@@ -52,7 +42,7 @@
         el.removeAttr('data-bind-has-data');
       }
       renderProperties = function(text, data) {
-        var prop, render, source, value;
+        var e, prop, render, source, value;
         if (data == null) {
           return {};
         }
@@ -102,88 +92,93 @@
           bindChildren = $([el].concat(bindChildren.get()));
         }
         repeatChildren = [];
-        bindChildren.each((function(_this) {
-          return function(index, _child) {
-            var child, childForeachs, repeatParents;
-            child = $(_child);
-            repeatParents = child.parent().closest('*[data-bind^="foreach"],*[data-bind-foreach]').get();
-            childForeachs = el.find('*[data-bind^="foreach"],*[data-bind-foreach]').get();
-            repeatParents = $(_.intersection(childForeachs, repeatParents));
-            if (repeatParents.length > 0) {
-              repeatChildren.push(_child);
-            }
-            return repeatParents.each(function(index, _parent) {
-              var parent, template, templateSelector, tmpl;
-              parent = $(_parent);
-              template = parent.data('bind-foreach-template');
-              if (!template) {
-                templateSelector = parent.attr('data-bind-template-selector');
-                if (typeof templateSelector === 'string') {
-                  template = $(templateSelector);
-                  tmpl = template.data('bind-foreach-template');
-                  if (tmpl) {
-                    template = tmpl;
-                  }
-                } else {
-                  template = parent.children();
-                }
-                parent.data('bind-foreach-template', template);
+        bindChildren.each(function(index, _child) {
+          var child, repeatParents, repeatResult;
+          child = $(_child);
+          repeatParents = child.parent().closest('*[data-bind^="foreach"],*[data-bind-foreach]').get();
+          repeatChildren = el.find('*[data-bind^="foreach"],*[data-bind-foreach]').get();
+          repeatResult = [];
+          $.each(repeatChildren, function(index, c) {
+            return $.each(repeatParents, function(index, p) {
+              if (c === p) {
+                return repeatResult.push(p);
               }
-              return parent.empty();
             });
-          };
-        })(this));
+          });
+          repeatParents = $(repeatResult);
+          if (repeatParents.length > 0) {
+            repeatChildren.push(_child);
+          }
+          return repeatParents.each(function(index, _parent) {
+            var parent, template, templateSelector, tmpl;
+            parent = $(_parent);
+            template = parent.data('bind-foreach-template');
+            if (!template) {
+              templateSelector = parent.attr('data-bind-template-selector');
+              if (typeof templateSelector === 'string') {
+                template = $(templateSelector);
+                tmpl = template.data('bind-foreach-template');
+                if (tmpl) {
+                  template = tmpl;
+                }
+              } else {
+                template = parent.children();
+              }
+              parent.data('bind-foreach-template', template);
+            }
+            return parent.empty();
+          });
+        });
         bindChildren = el.find(selectors.join(','));
         if (el.is(selectors.join(','))) {
           bindChildren = $([el].concat(bindChildren.get()));
         }
-        return bindChildren.each((function(_this) {
-          return function(index, _child) {
-            var all, bindDef, child, classes, events, item, key, matches, name, oldStyle, oldValue, source, style, styles, template, tmpl, type, typeData, types, urlStyle, value, _j, _k, _l, _len1, _len2, _len3;
-            child = $(_child);
-            types = [];
-            for (_j = 0, _len1 = selectorTypes.length; _j < _len1; _j++) {
-              selectorType = selectorTypes[_j];
-              if (child.is("*[data-bind-" + selectorType + "]")) {
-                source = child.attr("data-bind-" + selectorType);
+        return bindChildren.each(function(index, _child) {
+          var bindDef, child, classes, events, item, key, matches, name, oldStyle, oldValue, source, style, styles, template, tmpl, type, typeData, types, urlStyle, value, _j, _k, _l, _len1, _len2, _len3;
+          child = $(_child);
+          types = [];
+          for (_j = 0, _len1 = selectorTypes.length; _j < _len1; _j++) {
+            selectorType = selectorTypes[_j];
+            if (child.is("*[data-bind-" + selectorType + "]")) {
+              source = child.attr("data-bind-" + selectorType);
+              types.push({
+                type: selectorType,
+                source: source
+              });
+            }
+          }
+          if (child.is('*[data-bind]')) {
+            bindDef = child.attr('data-bind');
+            if (typeof bindDef === 'string') {
+              matches = bindDef.match(/^([a-zA-Z]+)(?:\:(.*))?$/);
+              if (matches) {
                 types.push({
-                  type: selectorType,
-                  source: source
+                  type: matches[1],
+                  source: matches[2]
                 });
               }
             }
-            if (child.is('*[data-bind]')) {
-              bindDef = child.attr('data-bind');
-              if (typeof bindDef === 'string') {
-                matches = bindDef.match(/^([a-zA-Z]+)(?:\:(.*))?$/);
-                if (matches) {
-                  all = matches[0], type = matches[1], source = matches[2];
-                  types.push({
-                    type: type,
-                    source: source
-                  });
+          }
+          for (_k = 0, _len2 = types.length; _k < _len2; _k++) {
+            typeData = types[_k];
+            type = typeData.type, source = typeData.source;
+            type = type.replace(/^\s+/, '').replace(/\s+$/, '');
+            source = source.replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&amp;', '&');
+            source = source ? source.replace(/^\s+/, '').replace(/\s+$/, '') : 'this';
+            source = source.replace(/(@|\$data)([a-zA-Z])/g, 'data.$2');
+            source = source.replace(/(@|\$data)/g, 'data');
+            switch (type) {
+              case 'foreach':
+                if (!source || source === 'data') {
+                  value = data;
+                } else {
+                  value = renderProperties('{value:' + source + '}', data);
+                  value = value.value;
                 }
-              }
-            }
-            for (_k = 0, _len2 = types.length; _k < _len2; _k++) {
-              typeData = types[_k];
-              type = typeData.type, source = typeData.source;
-              type = type.replace(/^\s+/, '').replace(/\s+$/, '');
-              source = source.replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&amp;', '&');
-              source = source ? source.replace(/^\s+/, '').replace(/\s+$/, '') : 'this';
-              source = source.replace(/(@|\$data)([a-zA-Z])/g, 'data.$2');
-              source = source.replace(/(@|\$data)/g, 'data');
-              switch (type) {
-                case 'foreach':
-                  if (!source || source === 'data') {
-                    value = data;
-                  } else {
-                    value = renderProperties('{value:' + source + '}', data);
-                    value = value.value;
-                  }
-                  template = child.data('bind-foreach-template');
-                  child.empty();
-                  if ($.isArray(value) || (typeof (value != null ? value.length : void 0) === 'number' && typeof (value != null ? value.push : void 0) === 'function')) {
+                template = child.data('bind-foreach-template');
+                child.empty();
+                if (value) {
+                  if ($.isArray(value) || (typeof value.length === 'number' && typeof value.push === 'function')) {
                     for (_l = 0, _len3 = value.length; _l < _len3; _l++) {
                       item = value[_l];
                       tmpl = template.clone(true);
@@ -191,118 +186,120 @@
                       child.append(tmpl);
                     }
                   }
-                  break;
-                case 'text':
-                  if (data == null) {
-                    return;
-                  }
-                  value = null;
-                  if (!source || source === 'data') {
-                    value = data;
-                  } else {
-                    value = renderProperties('{value:' + source + '}', data);
-                    value = value.value;
-                  }
-                  if (value == null) {
-                    value = '';
-                  }
-                  oldValue = child.text();
-                  if (oldValue !== value) {
-                    child.text(value);
-                  }
-                  break;
-                case 'html':
-                  if (data == null) {
-                    return;
-                  }
-                  value = null;
-                  if (!source || source === 'data') {
-                    value = data;
-                  } else {
-                    value = renderProperties('{value:' + source + '}', data);
-                    value = value.value;
-                  }
-                  if (value == null) {
-                    value = '';
-                  }
-                  oldValue = child.text();
-                  if (oldValue !== value) {
-                    child.html(value);
-                  }
-                  break;
-                case 'class':
-                  classes = renderProperties(source, data);
-                  for (key in classes) {
-                    value = classes[key];
-                    if (value) {
-                      child.addClass(key);
-                    } else {
-                      child.removeClass(key);
-                    }
-                  }
-                  break;
-                case 'style':
-                  styles = renderProperties(source, data);
-                  for (key in styles) {
-                    style = styles[key];
-                    oldStyle = child.css(key);
-                    urlStyle = style.replace(/url\(\/(.+)\)/, 'url(' + location.origin + '$1)');
-                    if (style !== oldStyle && urlStyle !== oldStyle) {
-                      child.css(key, style);
-                    }
-                  }
-                  break;
-                case 'attr':
-                  child.attr(renderProperties(source, data));
-                  break;
-                case 'visible':
-                  value = null;
-                  if (!source || source === 'data') {
-                    value = data;
-                  } else {
-                    value = renderProperties('{value:' + source + '}', data);
-                    value = value.value;
-                  }
-                  if (value == null) {
-                    value = false;
-                  }
+                }
+                break;
+              case 'text':
+                if (data == null) {
+                  return;
+                }
+                value = null;
+                if (!source || source === 'data') {
+                  value = data;
+                } else {
+                  value = renderProperties('{value:' + source + '}', data);
+                  value = value.value;
+                }
+                if (value == null) {
+                  value = '';
+                }
+                oldValue = child.text();
+                if (oldValue !== value) {
+                  child.text(value);
+                }
+                break;
+              case 'html':
+                if (data == null) {
+                  return;
+                }
+                value = null;
+                if (!source || source === 'data') {
+                  value = data;
+                } else {
+                  value = renderProperties('{value:' + source + '}', data);
+                  value = value.value;
+                }
+                if (value == null) {
+                  value = '';
+                }
+                oldValue = child.text();
+                if (oldValue !== value) {
+                  child.html(value);
+                }
+                break;
+              case 'class':
+                classes = renderProperties(source, data);
+                for (key in classes) {
+                  value = classes[key];
                   if (value) {
-                    child.attr('style', ("" + (child.attr('style'))).replace(/display:([^;]+)/, ''));
+                    child.addClass(key);
                   } else {
-                    child.hide();
+                    child.removeClass(key);
                   }
-                  break;
-                case 'data':
-                  value = null;
-                  if (!source || source === 'data') {
-                    value = data;
-                  } else {
-                    value = renderProperties('{value:' + source + '}', data);
-                    value = value.value;
+                }
+                break;
+              case 'style':
+                styles = renderProperties(source, data);
+                for (key in styles) {
+                  style = styles[key];
+                  oldStyle = child.css(key);
+                  urlStyle = style.replace(/url\(\/(.+)\)/, 'url(' + location.origin + '$1)');
+                  if (style !== oldStyle && urlStyle !== oldStyle) {
+                    child.css(key, style);
                   }
-                  child.data('data', value);
-                  break;
-                case 'event':
-                  events = renderProperties(source, data);
-                  for (name in events) {
-                    value = events[name];
-                    child.off("" + name + ".tempaa");
-                    child.on("" + name + ".tempaa", $.proxy(value, data));
-                  }
-              }
+                }
+                break;
+              case 'attr':
+                child.attr(renderProperties(source, data));
+                break;
+              case 'visible':
+                value = null;
+                if (!source || source === 'data') {
+                  value = data;
+                } else {
+                  value = renderProperties('{value:' + source + '}', data);
+                  value = value.value;
+                }
+                if (value == null) {
+                  value = false;
+                }
+                if (value) {
+                  child.attr('style', ("" + (child.attr('style'))).replace(/display:([^;]+)/, ''));
+                } else {
+                  child.hide();
+                }
+                break;
+              case 'data':
+                value = null;
+                if (!source || source === 'data') {
+                  value = data;
+                } else {
+                  value = renderProperties('{value:' + source + '}', data);
+                  value = value.value;
+                }
+                child.data('data', value);
+                break;
+              case 'event':
+                events = renderProperties(source, data);
+                for (name in events) {
+                  value = events[name];
+                  child.off("" + name + ".tempaa");
+                  child.on("" + name + ".tempaa", $.proxy(value, data));
+                }
             }
-          };
-        })(this));
+          }
+        });
       })();
-      if (Object.observe) {
-        Object.observe(data, dataBind);
-        el.data('bind-func', dataBind);
-      } else if (typeof (data != null ? data.addListener : void 0) === 'function') {
-        data.addListener('change', dataBind);
-        el.data('bind-func', dataBind);
-      } else if (typeof (data != null ? data.on : void 0) === 'function') {
-        data.on('change', dataBind);
-        el.data('bind-func', dataBind);
+      if (data) {
+        if (Object.observe) {
+          Object.observe(data, dataBind);
+          el.data('bind-func', dataBind);
+        } else if (typeof data.addListener === 'function') {
+          data.addListener('change', dataBind);
+          el.data('bind-func', dataBind);
+        } else if (typeof data.on === 'function') {
+          data.on('change', dataBind);
+          el.data('bind-func', dataBind);
+        }
       }
       return el;
     };

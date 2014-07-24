@@ -30,22 +30,16 @@ class Tempaa
     oldData = el.data 'data'
     dataBindFunc = el.data 'bind-func'
 
-    if oldData
-      try
-        return if _.isEqual JSON.parse(JSON.stringify(oldData)), JSON.parse(JSON.stringify(data))
-      catch e
-        ''
+    if oldData and dataBindFunc
+      if Object.unobserve
+        Object.unobserve oldData, dataBindFunc
+      else if typeof oldData.removeListener is 'function'
+        oldData.removeListener 'change', dataBindFunc
+      else if typeof oldData.off is 'function'
+        oldData.off 'change', dataBindFunc
 
-      if dataBindFunc
-        if Object.unobserve
-          Object.unobserve oldData, dataBindFunc
-        else if typeof oldData.removeListener is 'function'
-          oldData.removeListener 'change', dataBindFunc
-        else if typeof oldData.off is 'function'
-          oldData.off 'change', dataBindFunc
-
-    el.data('data', data)
-    el.data('bind-func', null)
+    el.data 'data', data
+    el.data 'bind-func', null
 
     if data
       el.attr 'data-bind-has-data', 'true'
@@ -88,55 +82,60 @@ class Tempaa
 
     do dataBind = ->
 
-      bindChildren = el.find(selectors.join(','))
-      if el.is(selectors.join(','))
+      bindChildren = el.find selectors.join ','
+      if el.is selectors.join ','
         bindChildren = $ [el].concat bindChildren.get()
 
       repeatChildren = []
-      bindChildren.each (index, _child)=>
+      bindChildren.each (index, _child)->
         child = $ _child
         repeatParents = child.parent().closest('*[data-bind^="foreach"],*[data-bind-foreach]').get()
 
-        childForeachs = el.find('*[data-bind^="foreach"],*[data-bind-foreach]').get()
-        repeatParents = $ _.intersection childForeachs, repeatParents
+        repeatChildren = el.find('*[data-bind^="foreach"],*[data-bind-foreach]').get()
+
+        repeatResult = []
+        $.each repeatChildren, (index, c)->
+          $.each repeatParents, (index, p)->
+            if c is p
+              repeatResult.push p
+
+        repeatParents = $ repeatResult
 
         if repeatParents.length > 0
           repeatChildren.push _child
-        repeatParents.each (index, _parent)=>
+        repeatParents.each (index, _parent)->
           parent = $ _parent
-          template = parent.data('bind-foreach-template')
+          template = parent.data 'bind-foreach-template'
           unless template
-            templateSelector = parent.attr('data-bind-template-selector')
+            templateSelector = parent.attr 'data-bind-template-selector'
             if typeof templateSelector is 'string'
-              template = $(templateSelector)
-              tmpl = template.data('bind-foreach-template')
+              template = $ templateSelector
+              tmpl = template.data 'bind-foreach-template'
               template = tmpl if tmpl
             else
               template = parent.children()
-            parent.data('bind-foreach-template', template)
+            parent.data 'bind-foreach-template', template
           parent.empty()
 
-      bindChildren = el.find(selectors.join(','))
-      if el.is(selectors.join(','))
+      bindChildren = el.find selectors.join ','
+      if el.is selectors.join ','
         bindChildren = $ [el].concat bindChildren.get()
 
-      bindChildren.each (index, _child)=>
+      bindChildren.each (index, _child)->
         child = $ _child
 
         types = []
 
         for selectorType in selectorTypes
-          if child.is("*[data-bind-#{selectorType}]")
-            source = child.attr("data-bind-#{selectorType}")
+          if child.is "*[data-bind-#{selectorType}]"
+            source = child.attr "data-bind-#{selectorType}"
             types.push type: selectorType, source: source
 
-        if child.is('*[data-bind]')
-          bindDef = child.attr('data-bind')
+        if child.is '*[data-bind]'
+          bindDef = child.attr 'data-bind'
           if typeof bindDef is 'string'
             matches = bindDef.match /^([a-zA-Z]+)(?:\:(.*))?$/
-            if matches
-              [all, type, source] = matches
-              types.push type: type, source: source
+            types.push type: matches[1], source: matches[2] if matches
 
         # 
         for typeData in types
@@ -157,13 +156,14 @@ class Tempaa
                 value = renderProperties '{value:' + source + '}', data
                 value = value.value
 
-              template = child.data('bind-foreach-template')
+              template = child.data 'bind-foreach-template'
               child.empty()
-              if $.isArray(value) or (typeof value?.length is 'number' and typeof value?.push is 'function')
-                for item in value
-                  tmpl = template.clone(true)
-                  Tempaa.bind tmpl, item
-                  child.append tmpl
+              if value
+                if $.isArray(value) or (typeof value.length is 'number' and typeof value.push is 'function')
+                  for item in value
+                    tmpl = template.clone true
+                    Tempaa.bind tmpl, item
+                    child.append tmpl
 
             # text
             when 'text'
@@ -243,30 +243,31 @@ class Tempaa
               else
                 value = renderProperties '{value:' + source + '}', data
                 value = value.value
-              child.data('data', value)
+              child.data 'data', value
 
             # event
             when 'event'
               events = renderProperties source, data
               for name, value of events
                 child.off "#{name}.tempaa"
-                child.on "#{name}.tempaa", $.proxy(value, data)
+                child.on "#{name}.tempaa", $.proxy value, data
 
     # watch
-    if Object.observe
-      # console.log '[Tempaa] Object.observe'
-      Object.observe data, dataBind
-      el.data 'bind-func', dataBind
+    if data
+      if Object.observe
+        # console.log '[Tempaa] Object.observe'
+        Object.observe data, dataBind
+        el.data 'bind-func', dataBind
 
-    else if typeof data?.addListener is 'function'
-      # console.log '[Tempaa] addListener'
-      data.addListener 'change', dataBind
-      el.data 'bind-func', dataBind
+      else if typeof data.addListener is 'function'
+        # console.log '[Tempaa] addListener'
+        data.addListener 'change', dataBind
+        el.data 'bind-func', dataBind
 
-    else if typeof data?.on is 'function'
-      # console.log '[Tempaa] on'
-      data.on 'change', dataBind
-      el.data 'bind-func', dataBind
+      else if typeof data.on is 'function'
+        # console.log '[Tempaa] on'
+        data.on 'change', dataBind
+        el.data 'bind-func', dataBind
 
     return el
 

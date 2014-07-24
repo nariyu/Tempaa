@@ -1,33 +1,29 @@
 
 # require modules
 gulp        = require 'gulp'
-clean       = require 'gulp-clean'
-coffee      = require 'gulp-coffee'
-uglify      = require 'gulp-uglify'
-rename      = require 'gulp-rename'
-webserver   = require 'gulp-webserver'
-open        = require 'gulp-open'
+loadPlugins = require 'gulp-load-plugins'
 runSequence = require 'run-sequence'
+$ = loadPlugins()
 
 # Clean
 gulp.task 'clean', ->
   gulp.src 'dist'
-    .pipe clean()
+    .pipe $.clean()
 
 # JavaScript
 gulp.task 'js', ->
   gulp.src 'src/**/*.coffee'
-    .pipe coffee()
+    .pipe $.coffee()
     .pipe gulp.dest 'dist'
 
 # JavaScript .min
 gulp.task 'js-min', ->
   gulp.src 'src/**/*.coffee'
-    .pipe rename (path)->
+    .pipe $.rename (path)->
       path.basename += ".min"
       return
-    .pipe coffee()
-    .pipe uglify()
+    .pipe $.coffee()
+    .pipe $.uglify()
     .pipe gulp.dest 'dist'
 
 # Watch
@@ -37,28 +33,28 @@ gulp.task 'watch', ->
 # Web Server
 gulp.task 'webserver', ->
   gulp.src '.'
-    .pipe webserver
+    .pipe $.webserver
       host: '0.0.0.0'
       port: 3000
-      # livereload: true
+      livereload: true
 
 # Open Browser
 gulp.task 'open', ->
   gulp.src 'examples/index.html'
-    .pipe open '', url: 'http://localhost:3000/examples/'
+    .pipe $.open '', url: 'http://localhost:3000/examples/'
 
 
 ###
   Tasks
 ###
 
-# Default Task
+# Default Task (None)
 gulp.task 'default', -> ''
 
 # Development
-gulp.task 'dev', ['clean'], ->
-  runSequence 'clean', 'js', 'watch', 'webserver', 'open'
+gulp.task 'develop', ->
+  runSequence 'clean', ['js', 'js-min'], 'watch', 'webserver', 'open'
 
 # Build
-gulp.task 'build', ['clean'], ->
-  runSequence 'clean', 'js', 'js-min'
+gulp.task 'build', ->
+  runSequence 'clean', ['js', 'js-min']

@@ -1,6 +1,6 @@
 {
   "name": "tempaa",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "authors": [
     "nariyu <nariyu@gmail.com>"
   ],
@@ -21,7 +21,6 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "1",
-    "lodash": "~2.4.1"
+    "jquery": "1"
   }
 }
