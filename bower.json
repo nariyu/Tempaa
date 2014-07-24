@@ -1,0 +1,28 @@
+{
+  "name": "tempaa",
+  "version": "0.1.0",
+  "authors": [
+    "nariyu <nariyu@gmail.com>"
+  ],
+  "description": "Template engine with data-binding.",
+  "main": "dist/tempaa.js",
+  "keywords": [
+    "template",
+    "view",
+    "javascript"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/nariyu/tempaa",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "1",
+    "lodash": "~2.4.1"
+  }
+}

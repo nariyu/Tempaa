@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+    <title>Example for Tempaa</title>
+    <script src="../bower_components/jquery/dist/jquery.js"></script>
+    <script src="../bower_components/lodash/dist/lodash.js"></script>
+    <script src="../dist/tempaa.js"></script>
+    <script>
+      $(function() {
+
+        // data
+        var data = {
+          "text": "lorem ipsum",
+          "items": [
+            {
+              name: "Item #0",
+              textColor: "#F00",
+              smile: true,
+              isBox: false,
+              url: null,
+              onclick: null
+            },
+            {
+              name: "Item #1",
+              textColor: "#000",
+              smile: false,
+              isBox: true,
+              url: null,
+              onclick: function() { alert('Click!'); }
+            },
+            {
+              name: "Item #2",
+              textColor: "#000",
+              smile: true,
+              isBox: false,
+              url: 'https://github.com/nariyu',
+              onclick: null
+            },
+            {
+              name: "Item #3",
+              textColor: "#00F",
+              smile: false,
+              isBox: false,
+              url: 'https://github.com/visionmedia',
+              onclick: null
+            }
+          ]
+        };
+
+        // set template
+        Tempaa.bind('#example', data);
+
+        // update property
+        setTimeout(function() {
+          data.text = "text updated!";
+        }, 500);
+
+        // update array
+        setTimeout(function() {
+          data.items.push({
+            name: "Item #4",
+            textColor: "#000",
+            smile: false,
+            isBox: false,
+            url: null,
+            onclick: null
+          });
+          data.items = data.items.slice();
+        }, 1000);
+
+        // update array
+        setTimeout(function() {
+          data.items.shift();
+          data.items = data.items.slice();
+        }, 1500);
+
+        // update array
+        setTimeout(function() {
+          data.items[1].name = 'name updated!';
+          data.items = data.items.slice();
+        }, 2000);
+      });
+    </script>
+    <style type="text/css">
+    li {
+      margin: 15px 0;
+    }
+    .box {
+      width: 200px;
+      padding: 5px 10px;
+      background-color: #EEE;
+      border: 1px solid #BBB;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>Example for Tempaa</h1>
+    <div id="example">
+
+      <!-- test of data-bind-text -->
+      <p>TEXT: <span data-bind-text="text">TEXT</span></p>
+
+      <!-- test of data-bind-foreach -->
+      <ul data-bind-foreach="items">
+
+        <!-- test of data-bind-style, data-bind-class, data-bind-event -->
+        <li data-bind-style="{color: textColor}" data-bind-class="{box: isBox}" data-bind-event="{click: onclick}">
+          <span data-bind-text="name"></span>
+
+          <!-- test of data-bind-visible -->
+          <span data-bind-visible="smile">:D</span>
+
+          <!-- test of data-bind-attr -->
+          <a data-bind-visible="url" data-bind-attr="{href: url}">Link</a>
+        </li>
+      </ul>
+      <p></p>
+    </div>
+  </body>
+</html>
