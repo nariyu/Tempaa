@@ -22,5 +22,8 @@
   ],
   "dependencies": {
     "jquery": "1"
+  },
+  "devDependencies": {
+    "eventemitter2": "~0.4.14"
   }
 }
