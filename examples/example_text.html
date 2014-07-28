@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+    <title>Example for Tempaa Text</title>
+    <script src="../bower_components/jquery/dist/jquery.js"></script>
+    <script src="../dist/tempaa.js"></script>
+    <script>
+
+      Tempaa.pre = function(el) { el.removeClass('template') };
+
+      $(function() {
+
+        // data
+        var data = {
+          "text": "lorem ipsum ...",
+        };
+
+        var p = $('#example p')
+        for (var i = 0; i < 500; i++) {
+          p = p.clone(true);
+          $('#example').append(p);
+        }
+
+        var s = +new Date;
+
+        // set template
+        Tempaa.bind('#example', data);
+
+        $('#time').text((+new Date - s) + "ms");
+      });
+    </script>
+    <style type="text/css">
+    .template {
+      display: none;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>Example for Tempaa Text</h1>
+    <p>Process Time: <span id="time"></span></p>
+    <div id="example" class="template">
+
+      <!-- test of data-bind-text -->
+      <p>TEXT: <span data-bind-text="text">TEXT</span></p>
+    </div>
+  </body>
+</html>

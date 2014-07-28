@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+    <title>Example for Tempaa (EventEmitter)</title>
+    <script src="../bower_components/jquery/dist/jquery.js"></script>
+    <script src="../bower_components/eventemitter2/lib/eventemitter2.js"></script>
+    <script src="../dist/tempaa.js"></script>
+    <script>
+      $(function() {
+
+        // define TestModel model class
+        var TestModel = function() {
+
+          // extend EventEmitter2
+          $.extend(this, EventEmitter2.prototype);
+
+          // defalt property value
+          this.text = 'lorem ipsum ...';
+        };
+
+
+        // create instance
+        var model = new TestModel;
+
+
+        // set template
+        Tempaa.bind('#example', model);
+
+
+        // change Event
+        setTimeout(function() {
+          model.text = 'text changed!';
+          model.emit('change'); // event trigger
+        }, 1000);
+
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Example for Tempaa (EventEmitter)</h1>
+    <div id="example">
+
+      <!-- test of data-bind-text -->
+      <p>TEXT: <span data-bind-text="text"></span></p>
+    </div>
+  </body>
+</html>

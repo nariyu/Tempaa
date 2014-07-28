@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+    <title>Example for Tempaa (Object.defineProperty)</title>
+    <script src="../bower_components/jquery/dist/jquery.js"></script>
+    <script src="../bower_components/eventemitter2/lib/eventemitter2.js"></script>
+    <script src="../dist/tempaa.js"></script>
+    <script>
+      $(function() {
+
+        // define TestModel model class
+        var TestModel = function() {
+
+          // extend EventEmitter2
+          $.extend(this, EventEmitter2.prototype);
+
+          // define properties
+          var properties = ['text', 'name'];
+
+          // Object.defineProperty
+          for (var i = 0; i < properties.length; i++) {
+            (function(self) {
+              var property = properties[i];
+
+              Object.defineProperty(self, property, {
+                set: function(value) {
+                  self['_' + property] = value;
+                  self.emit('change'); // event trigger
+                },
+                get: function() {
+                  return self['_' + property];
+                },
+                enumerable: true
+              });
+            })(this);
+          }
+
+          // default property values
+          this.name = 'TestModel';
+          this.text = 'Lorem ipsum dolor sit amet, consectetur ...';
+        };
+
+
+
+        // create instance
+        var model = new TestModel;
+
+
+        // set template
+        Tempaa.bind('#example', model);
+
+
+        // change Event
+        setTimeout(function() {
+          model.text = 'text changed!';
+        }, 1000);
+
+        setTimeout(function() {
+          model.name = 'name changed!';
+        }, 1500);
+
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Example for Tempaa (Object.defineProperty)</h1>
+    <div id="example">
+
+      <!-- test of data-bind-text -->
+      <p>NAME: <span data-bind-text="name"></span></p>
+      <p>TEXT: <span data-bind-text="text"></span></p>
+    </div>
+  </body>
+</html>
