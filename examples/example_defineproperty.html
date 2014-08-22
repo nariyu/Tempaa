@@ -9,55 +9,69 @@
     <script>
       $(function() {
 
-        // define TestModel model class
-        var TestModel = function() {
+        // Model base class
+        var Model = function() {};
 
-          // extend EventEmitter2
-          $.extend(this, EventEmitter2.prototype);
+        // extends EventEmitter2 class
+        $.extend(Model.prototype, EventEmitter2.prototype);
 
-          // define properties
-          var properties = ['text', 'name'];
-
+        // define properties method
+        Model.prototype.properties = function(props) {
           // Object.defineProperty
-          for (var i = 0; i < properties.length; i++) {
+          for (var i = 0; i < props.length; i++) {
             (function(self) {
-              var property = properties[i];
+              var prop = props[i];
 
-              Object.defineProperty(self, property, {
+              Object.defineProperty(self, prop, {
                 set: function(value) {
-                  self['_' + property] = value;
+                  self['_' + prop] = value;
                   self.emit('change'); // event trigger
                 },
                 get: function() {
-                  return self['_' + property];
+                  return self['_' + prop];
                 },
                 enumerable: true
               });
             })(this);
           }
-
-          // default property values
-          this.name = 'TestModel';
-          this.text = 'Lorem ipsum dolor sit amet, consectetur ...';
         };
+
+
+        // User class
+        var User = function(data) {
+
+          // define properties
+          this.properties(['name', 'description']);
+
+          // default properties
+          this.name = 'nariyu';
+          this.description = 'Lorem ipsum dolor sit amet, consectetur ...';
+
+          // set properties
+          data = data || {};
+          for (var prop in data) this[prop] = data[prop];
+        };
+
+        // extend Model class
+        $.extend(User.prototype, Model.prototype);
 
 
 
         // create instance
-        var model = new TestModel;
+        var user = new User;
 
 
         // set template
-        Tempaa.bind('#example', model);
+        Tempaa.bind('#user-info', user);
 
 
         // change Event
         setTimeout(function() {
-          model.text = 'text changed!';
+          user.description = 'description changed!';
         }, 1000);
 
         setTimeout(function() {
-          model.name = 'name changed!';
+          user.name = 'name changed!';
         }, 1500);
 
       });
@@ -65,11 +79,11 @@
   </head>
   <body>
     <h1>Example for Tempaa (Object.defineProperty)</h1>
-    <div id="example">
+    <div id="user-info">
 
       <!-- test of data-bind-text -->
       <p>NAME: <span data-bind-text="name"></span></p>
-      <p>TEXT: <span data-bind-text="text"></span></p>
+      <p>DESCRIPTION: <span data-bind-text="description"></span></p>
     </div>
   </body>
 </html>

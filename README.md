@@ -80,9 +80,11 @@ Tempaa.bind("#user", user);
 HTML:
 
 ```
-<ul id="list" data-bind-foreach="items">
-  <li data-bind-text="name"></li>
-</ul>
+<section id="list-section">
+  <ul id="list" data-bind-foreach="items">
+    <li data-bind-text="name"></li>
+  </ul>
+</section>
 ```
 
 JavaScript:
@@ -95,7 +97,7 @@ var data = {
     { name: "item #3" }
   ]
 };
-Tempaa.bind('#list', data);
+Tempaa.bind('#list-section', data);
 ```
 
 ### data-bind-text
