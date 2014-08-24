@@ -169,6 +169,35 @@ var data = {
 Tempaa.bind('p', data);
 ```
 
+### data-bind-prop
+
+HTML:
+
+```
+<div class="select-container">
+  <select data-bind-foreach="items">
+    <option data-bind-text="label"
+            data-bind-attr="{value: value}"
+            data-bind-prop="{selectd: selected}"></option>
+  </select>
+</div>
+```
+
+JavaScript:
+
+```
+var data = {
+  items: [
+    { label: 'Me', value: 1, selected: false },
+    { label: 'Me', value: 2, selected: true },
+    { label: 'Me', value: 3, selected: false }
+  ]
+};
+Tempaa.bind('.select-container', data);
+```
+
+(use jQery#prop method)
+
 ### data-bind-class
 
 HTML:

@@ -5,6 +5,7 @@
 ###
 class Tempaa
 
+  # tempaa types
   @selectorTypes: [
     'foreach'
     'text'
@@ -12,6 +13,7 @@ class Tempaa
     'class'
     'style'
     'attr'
+    'prop'
     'visible'
     'data'
     'event'
@@ -184,6 +186,10 @@ class Tempaa
             when 'attr'
               child.attr renderProperties source, data, helper
 
+            # prop
+            when 'prop'
+              child.prop renderProperties source, data, helper
+
             # visible
             when 'visible'
               value = null
@@ -217,21 +223,18 @@ class Tempaa
                 child.off "#{name}.tempaa"
                 child.on "#{name}.tempaa", $.proxy value, data
 
-    # watch
+    # watch data changed
     if data
 
       if typeof data.addListener is 'function'
-        # console.log '[Tempaa] addListener'
         data.addListener 'change', dataBind
         el.data 'bind-func', dataBind
 
       else if typeof data.on is 'function'
-        # console.log '[Tempaa] on'
         data.on 'change', dataBind
         el.data 'bind-func', dataBind
 
       else if Object.observe
-        # console.log '[Tempaa] Object.observe'
         Object.observe data, dataBind
         el.data 'bind-func', dataBind
 

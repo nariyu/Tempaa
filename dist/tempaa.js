@@ -9,7 +9,7 @@
   Tempaa = (function() {
     function Tempaa() {}
 
-    Tempaa.selectorTypes = ['foreach', 'text', 'html', 'class', 'style', 'attr', 'visible', 'data', 'event'];
+    Tempaa.selectorTypes = ['foreach', 'text', 'html', 'class', 'style', 'attr', 'prop', 'visible', 'data', 'event'];
 
 
     /*
@@ -204,6 +204,9 @@
                 break;
               case 'attr':
                 child.attr(renderProperties(source, data, helper));
+                break;
+              case 'prop':
+                child.prop(renderProperties(source, data, helper));
                 break;
               case 'visible':
                 value = null;
