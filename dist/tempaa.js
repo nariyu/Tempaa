@@ -129,7 +129,13 @@
                         destroyFuncs = [];
                       }
                       destroyFuncs.push(function() {
-                        return Array.unobserve(value, dataBind);
+                        var e;
+                        try {
+                          return Array.unobserve(value, dataBind);
+                        } catch (_error) {
+                          e = _error;
+                          return '';
+                        }
                       });
                       el.data('bind-destroy-funcs', destroyFuncs);
                     }

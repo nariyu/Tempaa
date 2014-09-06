@@ -1,6 +1,6 @@
 {
   "name": "tempaa",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A minimal template engine with data-binding.",
   "main": "dist/tempaa.js",
   "scripts": {},

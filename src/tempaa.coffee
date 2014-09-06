@@ -124,7 +124,12 @@ class Tempaa
                     Array.observe value, dataBind
                     destroyFuncs = el.data 'bind-destroy-funcs'
                     destroyFuncs = [] unless destroyFuncs?
-                    destroyFuncs.push -> Array.unobserve value, dataBind
+                    destroyFuncs.push ->
+                      try
+                        Array.unobserve value, dataBind
+                      catch e
+                        ''
+                      
                     el.data 'bind-destroy-funcs', destroyFuncs
 
                   for item in value
