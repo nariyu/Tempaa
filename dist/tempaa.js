@@ -106,7 +106,7 @@
             typeData = types[_k];
             type = typeData.type, source = typeData.source;
             type = type.replace(/^\s+/, '').replace(/\s+$/, '');
-            source = source.replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&amp;', '&');
+            source = source.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
             source = source ? source.replace(/^\s+/, '').replace(/\s+$/, '') : 'this';
             source = source.replace(/(@|\$data)([a-zA-Z])/g, 'data.$2');
             source = source.replace(/(@|\$data)/g, 'data');

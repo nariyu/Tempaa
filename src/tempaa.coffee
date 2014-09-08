@@ -101,7 +101,7 @@ class Tempaa
         for typeData in types
           { type, source } = typeData
           type  = type.replace(/^\s+/, '').replace(/\s+$/, '')
-          source = source.replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&amp;', '&')
+          source = source.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&')
           source = if source then source.replace(/^\s+/, '').replace(/\s+$/, '') else 'this'
           source = source.replace /(@|\$data)([a-zA-Z])/g, 'data.$2'
           source = source.replace /(@|\$data)/g, 'data'
