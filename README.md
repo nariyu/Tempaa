@@ -1,10 +1,10 @@
 # Tempaa
 
-[![npm](https://nodei.co/npm/tempaa.png?downloads=true)](https://nodei.co/npm/tempaa/)
+[![npm](https://nodei.co/npm/Tempaa.png?downloads=true)](https://nodei.co/npm/Tempaa/)
 
 Tempaa is a template engine with data-binding.
 
-[![Build Status](https://travis-ci.org/nariyu/tempaa.svg?branch=master)](https://travis-ci.org/nariyu/tempaa)
+[![Build Status](https://travis-ci.org/nariyu/Tempaa.svg?branch=master)](https://travis-ci.org/nariyu/Tempaa)
 
 Dependencies: jQuery
 
