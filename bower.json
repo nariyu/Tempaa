@@ -1,6 +1,6 @@
 {
   "name": "tempaa",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "authors": [
     "nariyu <nariyu@gmail.com>"
   ],
@@ -21,7 +21,7 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "~1"
+    "jquery": "*"
   },
   "devDependencies": {
     "eventemitter2": "~0.4.14"
