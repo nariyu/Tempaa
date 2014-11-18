@@ -1,7 +1,10 @@
 'use strict'
 
+$ = jQuery if jQuery?
+
+
 ###
-  Tempaa class
+Tempaa class
 ###
 class Tempaa
 
@@ -21,7 +24,7 @@ class Tempaa
 
 
   ###
-    Data binding
+  Data binding
   ###
   @bind: (_el, data)->
     el = $ _el
@@ -101,7 +104,6 @@ class Tempaa
         for typeData in types
           { type, source } = typeData
           type  = type.replace(/^\s+/, '').replace(/\s+$/, '')
-          source = source.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&')
           source = if source then source.replace(/^\s+/, '').replace(/\s+$/, '') else 'this'
           source = source.replace /(@|\$data)([a-zA-Z])/g, 'data.$2'
           source = source.replace /(@|\$data)/g, 'data'
@@ -131,6 +133,12 @@ class Tempaa
                         ''
                       
                     el.data 'bind-destroy-funcs', destroyFuncs
+
+                  for index in [ 0 ... value.length ]
+                    item = value[index]
+                    item['$$index'] = index
+                    item['$$before'] = value[index - 1]
+                    item['$$after'] = value[index + 1]
 
                   for item in value
                     tmpl = template.clone true
@@ -247,7 +255,7 @@ class Tempaa
 
 
   ###
-    Destroy
+  Destroy
   ###
   @destroy: (_el)->
     el = $ _el
@@ -272,6 +280,7 @@ class Tempaa
 
 
   ###
+  Render
   ###
   @renderProperties: (text, data, helper)->
     return {} unless data?
@@ -291,19 +300,19 @@ class Tempaa
       return render.call @, data, $, data, helper
     catch e
       console.error '[Tempaa] render properties error: ', e.message
-      console.log data
-      console.log source
+      # console.log data
+      # console.log source
 
-      if e.message.match /is not defined/
-        for prop, value of data
-          continue if typeof value is 'function'
-          console.log prop, value
+      # if e.message.match /is not defined/
+      #   for prop, value of data
+      #     continue if typeof value is 'function'
+      #     console.log prop, value
 
       return {}
 
 
 ###
-  exports
+exports
 ###
 if module?.exports
   module.exports = Tempaa

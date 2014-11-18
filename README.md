@@ -1,6 +1,6 @@
 # Tempaa
 
-[![npm](https://nodei.co/npm/Tempaa.png?downloads=true)](https://nodei.co/npm/Tempaa/)
+[![npm](https://nodei.co/npm/tempaa.png?downloads=true)](https://nodei.co/npm/tempaa/)
 
 Tempaa is a template engine with data-binding.
 
@@ -15,13 +15,13 @@ Supported event trigger: Object.observe(), EventEmitter, addListener
 ### Install by Bower
 
 ```
-$ bower install tempaa -S
+$ bower install -S tempaa
 ```
 
 ### Install by npm
 
 ```
-$ npm install tempaa --save
+$ npm install -S tempaa
 ```
 
 ## USAGE
@@ -48,8 +48,7 @@ JavaScript:
 var module = {
   name: "tempaa",
   dependencies: [
-    { name: "jquery", url: "http://jquery.com/" },
-    { name: "lodash", url: "http://lodash.com/" }
+    { name: "jquery", url: "http://jquery.com/" }
   ]
 };
 

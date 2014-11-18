@@ -115,7 +115,7 @@
         }, 2000);
 
         // retry
-        setTimeout(databind, 2500);
+        // setTimeout(databind, 2500);
       };
 
       $(databind);
@@ -157,6 +157,7 @@
 
         <!-- test of data-bind-style, data-bind-class, data-bind-event -->
         <li data-bind-style="{color: textColor}" data-bind-class="{box: isBox}" data-bind-event="{click: onclick}">
+          <span data-bind-text="$$index"></span>
           <span data-bind-text="name"></span>
 
           <!-- test of data-bind-visible -->

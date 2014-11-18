@@ -4,11 +4,12 @@ gulp        = require 'gulp'
 loadPlugins = require 'gulp-load-plugins'
 runSequence = require 'run-sequence'
 $ = loadPlugins()
+del         = require 'del'
+open        = require 'open'
 
 # Clean
-gulp.task 'clean', ->
-  gulp.src 'dist'
-    .pipe $.clean()
+gulp.task 'clean', (cb)->
+  del 'dist', cb
 
 # JavaScript
 gulp.task 'js', ->
@@ -28,7 +29,7 @@ gulp.task 'js-min', ->
 
 # Watch
 gulp.task 'watch', ->
-  gulp.watch 'src/**/*.{coffee,js,json,cson}', ['js']
+  gulp.watch 'src/**/*.{coffee,js,json,cson}', ['js', 'js-min']
 
 # Web Server
 gulp.task 'webserver', ->
@@ -36,12 +37,11 @@ gulp.task 'webserver', ->
     .pipe $.webserver
       host: '0.0.0.0'
       port: 3000
-      livereload: true
+      # livereload: true
 
 # Open Browser
 gulp.task 'open', ->
-  gulp.src 'examples/index.html'
-    .pipe $.open '', url: 'http://localhost:3000/examples/'
+  open 'http://localhost:3000/examples/'
 
 
 ###

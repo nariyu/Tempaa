@@ -1,10 +1,15 @@
 (function() {
   'use strict';
+  var $, Tempaa, exports;
+
+  if (typeof jQuery !== "undefined" && jQuery !== null) {
+    $ = jQuery;
+  }
+
 
   /*
-    Tempaa class
+  Tempaa class
    */
-  var Tempaa, exports;
 
   Tempaa = (function() {
     function Tempaa() {}
@@ -13,7 +18,7 @@
 
 
     /*
-      Data binding
+    Data binding
      */
 
     Tempaa.bind = function(_el, data) {
@@ -89,7 +94,7 @@
           bindChildren = $([el].concat(bindChildren.get()));
         }
         return bindChildren.each(function(index, _child) {
-          var child, classes, destroyFuncs, events, item, key, name, oldStyle, oldValue, source, style, styles, template, tmpl, type, typeData, types, urlStyle, value, _j, _k, _l, _len1, _len2, _len3;
+          var child, classes, destroyFuncs, events, item, key, name, oldStyle, oldValue, source, style, styles, template, tmpl, type, typeData, types, urlStyle, value, _j, _k, _l, _len1, _len2, _len3, _m, _ref;
           child = $(_child);
           types = [];
           for (_j = 0, _len1 = selectorTypes.length; _j < _len1; _j++) {
@@ -106,7 +111,6 @@
             typeData = types[_k];
             type = typeData.type, source = typeData.source;
             type = type.replace(/^\s+/, '').replace(/\s+$/, '');
-            source = source.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
             source = source ? source.replace(/^\s+/, '').replace(/\s+$/, '') : 'this';
             source = source.replace(/(@|\$data)([a-zA-Z])/g, 'data.$2');
             source = source.replace(/(@|\$data)/g, 'data');
@@ -139,8 +143,14 @@
                       });
                       el.data('bind-destroy-funcs', destroyFuncs);
                     }
-                    for (_l = 0, _len3 = value.length; _l < _len3; _l++) {
-                      item = value[_l];
+                    for (index = _l = 0, _ref = value.length; 0 <= _ref ? _l < _ref : _l > _ref; index = 0 <= _ref ? ++_l : --_l) {
+                      item = value[index];
+                      item['$$index'] = index;
+                      item['$$before'] = value[index - 1];
+                      item['$$after'] = value[index + 1];
+                    }
+                    for (_m = 0, _len3 = value.length; _m < _len3; _m++) {
+                      item = value[_m];
                       tmpl = template.clone(true);
                       child.append(tmpl);
                       Tempaa.bind(tmpl, item);
@@ -269,7 +279,7 @@
 
 
     /*
-      Destroy
+    Destroy
      */
 
     Tempaa.destroy = function(_el) {
@@ -300,6 +310,7 @@
 
 
     /*
+    Render
      */
 
     Tempaa.renderProperties = function(text, data, helper) {
@@ -326,17 +337,6 @@
       } catch (_error) {
         e = _error;
         console.error('[Tempaa] render properties error: ', e.message);
-        console.log(data);
-        console.log(source);
-        if (e.message.match(/is not defined/)) {
-          for (prop in data) {
-            value = data[prop];
-            if (typeof value === 'function') {
-              continue;
-            }
-            console.log(prop, value);
-          }
-        }
         return {};
       }
     };
@@ -347,7 +347,7 @@
 
 
   /*
-    exports
+  exports
    */
 
   if (typeof module !== "undefined" && module !== null ? module.exports : void 0) {

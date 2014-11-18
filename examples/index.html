@@ -18,6 +18,7 @@
               smile: true,
               isBox: false,
               url: null,
+              points: 10,
               onclick: null,
               items: []
             },
@@ -27,6 +28,7 @@
               smile: false,
               isBox: true,
               url: null,
+              points: 20,
               onclick: function() { alert('Click!'); },
               items: []
             },
@@ -35,6 +37,7 @@
               textColor: "#000",
               smile: true,
               isBox: false,
+              points: 5,
               url: 'https://github.com/nariyu',
               onclick: null,
               items: []
@@ -44,6 +47,7 @@
               textColor: "#00F",
               smile: false,
               isBox: false,
+              points: 12,
               url: 'https://github.com/visionmedia',
               onclick: null,
               items: []
@@ -67,6 +71,7 @@
             smile: false,
             isBox: false,
             url: null,
+            points: 100,
             onclick: null,
             items: []
           });
@@ -119,6 +124,7 @@
         <!-- test of data-bind-style, data-bind-class, data-bind-event -->
         <li data-bind-style="{color: textColor}" data-bind-class="{box: isBox}" data-bind-event="{click: onclick}">
           <span data-bind-text="name"></span>
+          <span data-bind-visible="points &gt; 10" data-bind-text="points + 'points'"></span>
 
           <!-- test of data-bind-visible -->
           <span class="smile" data-bind-visible="smile">:D</span>
